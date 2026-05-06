@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login | Noor Farra Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="auth-body">
+  <main class="auth-layout">
+    <section class="auth-visual">
+      <div class="auth-visual-overlay"></div>
+      <div class="auth-copy">
+        <p class="eyebrow">Private access</p>
+        <h1>Dashboard Login</h1>
+        <p>
+          Sign in to manage your portfolio projects, upload project images,
+          and publish new work directly to your public website.
+        </p>
+        <a href="index.html" class="btn btn-secondary">Back to Portfolio</a>
+      </div>
+    </section>
+
+    <section class="auth-panel">
+      <div class="auth-card reveal show">
+        <p class="eyebrow">Supabase Auth</p>
+        <h2>Welcome back</h2>
+        <p class="auth-note">Use the email and password you create inside Supabase Authentication.</p>
+
+        <form id="loginForm" class="auth-form">
+          <label>
+            <span>Email</span>
+            <input type="email" id="email" placeholder="your@email.com" required />
+          </label>
+
+          <label>
+            <span>Password</span>
+            <input type="password" id="password" placeholder="••••••••" required />
+          </label>
+
+          <button type="submit" class="btn btn-primary auth-btn">Sign In</button>
+        </form>
+
+        <p class="form-message" id="loginMessage"></p>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="js/login.js"></script>
+</body>
+</html>

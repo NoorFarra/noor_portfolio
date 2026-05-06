@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Noor Farra | Portfolio</title>
+  <meta name="description" content="Personal portfolio website for Noor Farra." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <header class="site-header" id="top">
+      <nav class="navbar container">
+        <a href="#home" class="brand">NOOR FARRA</a>
+
+        <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <div class="nav-links desktop-nav">
+          <a href="#home" class="nav-link active">Home</a>
+          <a href="#about" class="nav-link">About</a>
+          <a href="#projects" class="nav-link">Projects</a>
+          <a href="#contact" class="nav-link">Contact</a>
+        </div>
+      </nav>
+
+      <div class="mobile-menu" id="mobileMenu">
+        <a href="#home" class="mobile-link">Home</a>
+        <a href="#about" class="mobile-link">About</a>
+        <a href="#projects" class="mobile-link">Projects</a>
+        <a href="#contact" class="mobile-link">Contact</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero" id="home">
+        <div class="hero-media">
+          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuALo7PKhvH_rOVjp4EViwEMUFcWSLLac0S5ENOD3ppQAGAkEawctYYt_FHSKm-Zw3sO6x85cUr2L-iIxSan1ffytN4ykGhyDyBrAktDnLqCLjHtBkg7XQ_GTyKub628jXkv2Wn83qXzPyK498RuTxBWITG58hesb-JEskSGKZbgQ888X8dVWvZKx2uKmmwDFUTVCpam_swfxJL0tuwXc2xQvzTFOzpjSiRu_dgDdhjXjCTKXd_Tg4dSNFxX9lDwpUUYUS5oyJsovPI" alt="Atmospheric mountain background" />
+          <div class="hero-overlay"></div>
+        </div>
+
+        <div class="hero-content container reveal">
+          <p class="eyebrow">Editorial portfolio experience</p>
+          <h1>
+            Architecting the<br>
+            <span>Digital Horizon</span>
+          </h1>
+          <p class="hero-subtitle">Full Stack Developer / System Designer / Atmospheric Creative</p>
+         <div class="hero-actions">
+  <a href="#about" class="btn btn-primary">Explore My World</a>
+  <a href="#projects" class="btn btn-secondary">View Projects</a>
+
+  <!-- CV Button -->
+  <a href="./assets/noor-cv.pdf" download class="btn btn-secondary">
+    My CV
+  </a>
+</div>
+        </div>
+
+        <a href="#about" class="scroll-indicator" aria-label="Scroll to about section">
+          <span></span>
+        </a>
+      </section>
+
+      <section class="about section" id="about">
+        <div class="container about-grid">
+          <div class="about-image-wrap reveal">
+            <div class="about-image-card">
+              <img src="./assets/WhatsApp Image 2026-04-18 at 19.33.01.jpeg" alt="Professional portrait" />
+            </div>
+            <div class="quote-card">
+              <p>“The code is the peak, the experience is the atmosphere.”</p>
+            </div>
+          </div>
+
+          <div class="about-copy reveal delay-1">
+            <p class="eyebrow">The artisan</p>
+            <h2>Precision &amp; Ambience.</h2>
+            <p>
+              I am Noor Farra, a full stack developer focused on building elegant digital experiences that combine
+              strong engineering with refined visual direction.
+            </p>
+            <p>
+              My goal is not only to make products work well, but to make them feel polished, smooth, and memorable.
+              I care about clean architecture, beautiful interfaces, and details that improve the overall experience.
+            </p>
+
+            <div class="about-meta">
+              <div>
+                <h3>Core Stack</h3>
+                <ul>
+                  <li>Java / Python / JavaScript</li>
+                  <li>React / Next.js</li>
+                  <li>Node.js / APIs</li>
+                  <li>UI / UX / Motion</li>
+                </ul>
+              </div>
+              <div>
+                <h3>Philosophy</h3>
+                <ul>
+                  <li>Clean structure</li>
+                  <li>Smooth interactions</li>
+                  <li>Readable content</li>
+                  <li>Premium visual rhythm</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+   <section class="projects section section-alt" id="projects">
+  <div class="container">
+    <div class="section-head reveal">
+      <div>
+        <p class="eyebrow">Portfolio</p>
+        <h2>Selected Works</h2>
+      </div>
+      <p class="section-note" id="projectCount">Loading...</p>
+    </div>
+
+    <div id="projectsGrid" class="projects-grid"></div>
+  </div>
+</section>
+
+      <section class="contact section" id="contact">
+        <div class="contact-shape"></div>
+        <div class="container contact-grid">
+          <div class="contact-copy reveal">
+            <p class="eyebrow">Connection</p>
+            <h2>Let’s build <span>the summit.</span></h2>
+            <p>
+              Currently accepting select collaborations and new portfolio improvements. This contact block is ready for
+              later edits when you want to connect it to real email handling.
+            </p>
+
+            <div class="contact-list">
+              <a href="mailto:studio@noorfarra.com">n.farra@gmail.com</a>
+              <span>Global / Remote</span>
+            </div>
+          </div>
+
+          <form class="contact-form reveal delay-1" id="contactForm">
+            <label>
+              <span>Full Name</span>
+              <input type="text" name="from_name" placeholder="Your name" autocomplete="name" required />
+            </label>
+            <label>
+              <span>Email Address</span>
+              <input type="email" name="from_email" placeholder="your@email.com" autocomplete="email" required />
+            </label>
+            <label>
+              <span>Project Description</span>
+              <textarea rows="5" name="message" placeholder="Tell me about your idea" required></textarea>
+            </label>
+            <input type="hidden" name="to_name" value="Noor Farra" />
+            <p class="form-message" id="contactMessage" aria-live="polite"></p>
+            <button type="submit" class="btn btn-primary form-btn" id="contactSubmit">Send Transmission</button>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <div>
+          <strong>NOOR FARRA</strong>
+          <p>© 2026 Noor Farra. Crafted with atmosphere and clean code.</p>
+        </div>
+        <div class="footer-links">
+          <a target="_blank" href="https://www.linkedin.com/in/noorfarra/">LinkedIn</a>
+          <a target="_blank" href="https://github.com/NoorFarra">GitHub</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
