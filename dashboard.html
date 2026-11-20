@@ -24,9 +24,13 @@
       </div>
 
       <nav class="sidebar-nav">
-        <a href="#" class="nav-link active">
+        <a href="#projects" class="nav-link active">
           <span class="material-symbols-outlined">grid_view</span>
           <span>Projects</span>
+        </a>
+        <a href="#profileSettings" class="nav-link">
+          <span class="material-symbols-outlined" aria-hidden="true">account_circle</span>
+          <span>Profile photo</span>
         </a>
         <a href="index.html" class="nav-link">
           <span class="material-symbols-outlined">public</span>
@@ -67,13 +71,27 @@
     </header>
 
     <main class="main-content">
-      <section class="hero reveal show dashboard-hero">
+      <section class="hero reveal show dashboard-hero" id="projects">
         <p class="eyebrow">Project Administration</p>
         <h2>Portfolio<br>Curations</h2>
         <p class="hero-text">
-          Add, update, and delete the projects shown on your public portfolio.
-          Images are uploaded to Supabase Storage and project data is saved in PostgreSQL.
+          Manage the projects, GitHub links, and profile photo shown on your public portfolio.
         </p>
+      </section>
+
+      <section class="profile-settings" id="profileSettings" aria-labelledby="profilePhotoTitle">
+        <img class="profile-photo-preview" id="profilePhotoPreview" src="assets/noor-farra.jpg" alt="Your profile photo preview" width="112" height="140" />
+        <form id="profilePhotoForm" class="profile-photo-form">
+          <h2 id="profilePhotoTitle">Profile photo</h2>
+          <p>Choose a new photo for the portfolio homepage.</p>
+          <label for="profilePhotoFile">Choose photo</label>
+          <div class="profile-photo-controls">
+            <input type="file" id="profilePhotoFile" accept="image/jpeg,image/png,image/webp,image/avif" aria-describedby="profilePhotoHelp" />
+            <button class="btn btn-outline" type="submit" id="saveProfilePhotoBtn" disabled>Save photo</button>
+          </div>
+          <small class="helper-text" id="profilePhotoHelp">JPG, PNG, WebP, or AVIF. Up to 5 MB. Portrait photos work best.</small>
+          <p class="form-message" id="profilePhotoMessage" role="status" aria-live="polite"></p>
+        </form>
       </section>
 
       <div class="dashboard-toolbar reveal show">
@@ -92,7 +110,7 @@
     </main>
   </div>
 
-  <div class="modal hidden" id="projectModal" aria-hidden="true">
+  <div class="modal hidden" id="projectModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
     <div class="modal-backdrop" id="modalBackdrop"></div>
     <div class="modal-panel">
       <button class="icon-btn modal-close" id="closeModalBtn" aria-label="Close modal">
@@ -102,7 +120,7 @@
       <div class="modal-header">
         <p class="eyebrow" id="modalEyebrow">New Project</p>
         <h2 id="modalTitle">New Entry</h2>
-        <p>Define the title, description, project link, and cover image.</p>
+        <p>Add the title, description, project and GitHub links, and cover image.</p>
       </div>
 
       <form class="project-form" id="projectForm">
@@ -121,6 +139,12 @@
         <div class="form-group">
           <label for="projectLiveUrl">Live Application URL</label>
           <input type="url" id="projectLiveUrl" placeholder="https://example.com" required />
+        </div>
+
+        <div class="form-group">
+          <label for="projectGithubUrl">GitHub Repository URL <span class="optional-label">(optional)</span></label>
+          <input type="url" id="projectGithubUrl" placeholder="https://github.com/NoorFarra/project" maxlength="2048" aria-describedby="projectGithubHelp" />
+          <small class="helper-text" id="projectGithubHelp">Leave blank to hide the GitHub link.</small>
         </div>
 
         <div class="form-grid">

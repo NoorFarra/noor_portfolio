@@ -47,3 +47,11 @@ RLS allows visitors to read published projects and public project images. Only t
 The contact section uses the real public email address and phone number. It does not submit email automatically. Existing EmailJS configuration is retained for compatibility with the previous source.
 
 The dedicated project currently configured is `hzrsneyogjpobnqjaeim`. Browser code uses its publishable key; privileged keys are not included.
+
+## Dashboard updates
+
+Open `/dashboard.html` directly and sign in with the portfolio administrator account. The public footer does not link to the dashboard.
+
+- Add, edit, or clear the optional GitHub repository URL on any project. Clearing it hides the GitHub button on the public card.
+- In **Profile photo**, choose a JPEG, PNG, WebP, or AVIF up to 5 MB, review the preview, then save. The public portrait loads the saved image from Supabase; the bundled portrait remains the fallback.
+- `portfolio_settings` has one public-readable profile row; only allowlisted administrators can save it. Portrait uploads use the existing admin-only `project-images` bucket.

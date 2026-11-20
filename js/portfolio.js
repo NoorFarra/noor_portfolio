@@ -1,4 +1,5 @@
 import { PROJECTS } from './project-data.js';
+import { normalizeGithubUrl } from './project-links.js';
 
 const root = document.documentElement;
 const revealObserver = 'IntersectionObserver' in window ? new IntersectionObserver(entries => {
@@ -136,10 +137,12 @@ function renderPublishedProjects(rows) {
     links.replaceChildren();
     const liveUrl = safeUrl(row.live_url);
     if (liveUrl) { viewLink.href = liveUrl; links.append(viewLink); }
-    if (known?.github_url) {
+    let githubUrl = null;
+    try { githubUrl = normalizeGithubUrl(row.github_url); } catch { /* Ignore invalid external links. */ }
+    if (githubUrl) {
       const github = viewLink.cloneNode();
       github.textContent = 'GitHub';
-      github.href = known.github_url;
+      github.href = githubUrl;
       github.className = 'project-github';
       links.append(github);
     }
@@ -166,7 +169,7 @@ async function loadPublishedProjects() {
     const { supabase, ensureSupabase } = await import('./supabase-client.js');
     ensureSupabase();
     const { data, error } = await supabase.from('projects')
-      .select('id,title,description,image_url,live_url,is_published,is_featured,display_order,created_at')
+      .select('id,title,description,image_url,live_url,github_url,is_published,is_featured,display_order,created_at')
       .eq('is_published', true)
       .order('is_featured', { ascending: false })
       .order('display_order', { ascending: true })
@@ -180,3 +183,23 @@ async function loadPublishedProjects() {
   }
 }
 loadPublishedProjects();
+
+async function loadProfilePhoto() {
+  const image = document.querySelector('.portrait-frame img');
+  if (!image) return;
+  const fallback = image.getAttribute('src');
+  try {
+    const { supabase, ensureSupabase } = await import('./supabase-client.js');
+    ensureSupabase();
+    const { data, error } = await supabase.from('portfolio_settings')
+      .select('profile_image_url').eq('id', 'profile').maybeSingle()
+      .abortSignal(AbortSignal.timeout(6000));
+    if (error) throw error;
+    const url = safeUrl(data?.profile_image_url);
+    if (!url || new URL(url).protocol !== 'https:') return;
+    image.addEventListener('error', () => { image.src = fallback; }, { once: true });
+    image.src = url;
+    root.dataset.profileSource = 'supabase';
+  } catch { /* Keep the bundled portrait if the service is unavailable. */ }
+}
+loadProfilePhoto();

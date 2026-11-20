@@ -1,6 +1,7 @@
 import { supabase, ensureSupabase } from "./supabase-client.js";
 import { STORAGE_BUCKET } from "./config.js";
 import { escapeHtml, qs, setMessage, formatProjectCount, setupReveal } from "./utils.js";
+import { normalizeGithubUrl } from './project-links.js';
 
 setupReveal();
 
@@ -35,6 +36,7 @@ const fields = {
   title: qs("#projectTitle"),
   description: qs("#projectDescription"),
   liveUrl: qs("#projectLiveUrl"),
+  githubUrl: qs('#projectGithubUrl'),
   isFeatured: qs("#projectFeatured"),
 };
 
@@ -49,17 +51,21 @@ function toggleSidebar() {
 
 function openModal(editMode = false) {
   els.projectModal?.classList.remove("hidden");
+  els.projectModal?.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = "hidden";
   if (els.modalTitle) els.modalTitle.textContent = editMode ? "Edit Entry" : "New Entry";
   if (els.modalEyebrow) els.modalEyebrow.textContent = editMode ? "Edit Project" : "New Project";
   if (els.saveBtn) els.saveBtn.textContent = editMode ? "Save Changes" : "Create Entry";
+  fields.title?.focus();
 }
 
 function closeModal() {
   els.projectModal?.classList.add("hidden");
+  els.projectModal?.setAttribute('aria-hidden', 'true');
   document.body.style.overflow = "";
   els.projectForm?.reset();
   if (fields.id) fields.id.value = "";
+  fields.githubUrl?.setCustomValidity('');
   currentPreviewUrl = "";
   els.previewImg?.removeAttribute("src");
   els.previewWrap?.classList.add("hidden");
@@ -155,6 +161,7 @@ function renderProjects(projects) {
           <div class="project-meta">
             <span>${project.is_published ? "Published" : "Draft"}</span>
             <a href="${escapeHtml(project.live_url)}" target="_blank" rel="noreferrer" class="project-link">Live ↗</a>
+            ${project.github_url ? `<a href="${escapeHtml(project.github_url)}" target="_blank" rel="noopener noreferrer" class="project-link">GitHub</a>` : ''}
           </div>
         </div>
       </article>
@@ -182,6 +189,8 @@ function fillForm(project) {
   fields.title.value = project.title;
   fields.description.value = project.description;
   fields.liveUrl.value = project.live_url;
+  fields.githubUrl.value = project.github_url || '';
+  fields.githubUrl.setCustomValidity('');
   fields.isFeatured.value = String(project.is_featured);
   currentPreviewUrl = project.image_url || "";
 
@@ -241,6 +250,8 @@ els.projectForm?.addEventListener("submit", async (event) => {
   setMessage(els.message, "Saving project...");
 
   try {
+    if (els.saveBtn) els.saveBtn.disabled = true;
+    const githubUrl = normalizeGithubUrl(fields.githubUrl.value);
     const id = fields.id.value.trim();
     const file = els.imageInput.files?.[0];
     const existingProject = allProjects.find((item) => item.id === id);
@@ -257,6 +268,7 @@ els.projectForm?.addEventListener("submit", async (event) => {
       title: fields.title.value.trim(),
       description: fields.description.value.trim(),
       live_url: fields.liveUrl.value.trim(),
+      github_url: githubUrl,
       image_url: imageUrl,
       is_featured: fields.isFeatured.value === "true",
       is_published: true,
@@ -282,6 +294,8 @@ els.projectForm?.addEventListener("submit", async (event) => {
   } catch (error) {
     console.error(error);
     setMessage(els.message, error.message || "Unable to save project.", "error");
+  } finally {
+    if (els.saveBtn) els.saveBtn.disabled = false;
   }
 });
 
@@ -310,7 +324,7 @@ els.grid?.addEventListener("click", async (event) => {
 els.searchInput?.addEventListener("input", (event) => {
   const value = event.target.value.trim().toLowerCase();
   const filtered = allProjects.filter((project) =>
-    [project.title, project.description, project.live_url]
+    [project.title, project.description, project.live_url, project.github_url]
       .filter(Boolean)
       .some((item) => item.toLowerCase().includes(value))
   );
@@ -328,9 +342,90 @@ els.logoutLink?.addEventListener("click", async (event) => {
     ensureSupabase();
     const okay = await requireAuth();
     if (!okay) return;
-    await fetchProjects();
+    await Promise.all([fetchProjects(), loadProfilePhoto()]);
   } catch (error) {
     console.error(error);
     window.alert(error.message || "Failed to initialize dashboard.");
   }
 })();
+
+fields.githubUrl?.addEventListener('input', () => {
+  try {
+    normalizeGithubUrl(fields.githubUrl.value);
+    fields.githubUrl.setCustomValidity('');
+  } catch (error) {
+    fields.githubUrl.setCustomValidity(error.message);
+  }
+});
+
+const photoInput = qs('#profilePhotoFile');
+const photoPreview = qs('#profilePhotoPreview');
+const photoSave = qs('#saveProfilePhotoBtn');
+const photoMessage = qs('#profilePhotoMessage');
+let savedProfilePhoto = 'assets/noor-farra.jpg';
+let photoPreviewUrl = null;
+
+async function loadProfilePhoto() {
+  const { data, error } = await supabase.from('portfolio_settings')
+    .select('profile_image_url').eq('id', 'profile').maybeSingle();
+  if (error) throw error;
+  savedProfilePhoto = data?.profile_image_url || 'assets/noor-farra.jpg';
+  if (!photoInput?.files?.length && photoPreview) photoPreview.src = savedProfilePhoto;
+}
+
+photoInput?.addEventListener('change', () => {
+  if (photoPreviewUrl) URL.revokeObjectURL(photoPreviewUrl);
+  photoPreviewUrl = null;
+  const file = photoInput.files?.[0];
+  setMessage(photoMessage, '');
+  photoSave.disabled = !file;
+  if (!file) { photoPreview.src = savedProfilePhoto; return; }
+  if (!['image/jpeg', 'image/png', 'image/webp', 'image/avif'].includes(file.type) || file.size > 5 * 1024 * 1024) {
+    setMessage(photoMessage, 'Choose a JPG, PNG, WebP, or AVIF image up to 5 MB.', 'error');
+    photoInput.value = '';
+    photoPreview.src = savedProfilePhoto;
+    photoSave.disabled = true;
+    return;
+  }
+  photoPreviewUrl = URL.createObjectURL(file);
+  photoPreview.src = photoPreviewUrl;
+});
+
+qs('#profilePhotoForm')?.addEventListener('submit', async event => {
+  event.preventDefault();
+  const file = photoInput.files?.[0];
+  if (!file) return;
+  photoSave.disabled = true;
+  photoInput.disabled = true;
+  let newPath = null;
+  try {
+    setMessage(photoMessage, 'Saving your photo...');
+    const extensions = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/avif': 'avif' };
+    if (!extensions[file.type] || file.size > 5 * 1024 * 1024) throw new Error('Choose a supported image up to 5 MB.');
+    newPath = `profile/${crypto.randomUUID()}.${extensions[file.type]}`;
+    const { error: uploadError } = await supabase.storage.from(STORAGE_BUCKET)
+      .upload(newPath, file, { cacheControl: '3600', upsert: false });
+    if (uploadError) { newPath = null; throw uploadError; }
+    const { data: image } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(newPath);
+    const { error } = await supabase.from('portfolio_settings').upsert({
+      id: 'profile', profile_image_url: image.publicUrl, updated_at: new Date().toISOString(),
+    });
+    if (error) throw error;
+    savedProfilePhoto = image.publicUrl;
+    newPath = null;
+    photoInput.value = '';
+    photoPreview.src = savedProfilePhoto;
+    if (photoPreviewUrl) URL.revokeObjectURL(photoPreviewUrl);
+    photoPreviewUrl = null;
+    setMessage(photoMessage, 'Profile photo updated. It is now live on your portfolio.', 'success');
+  } catch (error) {
+    if (newPath) {
+      try { await supabase.storage.from(STORAGE_BUCKET).remove([newPath]); }
+      catch (cleanupError) { console.error('Could not clean up the unused upload.', cleanupError); }
+    }
+    setMessage(photoMessage, error.message || 'Unable to save your photo. Please try again.', 'error');
+  } finally {
+    photoInput.disabled = false;
+    photoSave.disabled = !photoInput.files?.length;
+  }
+});
