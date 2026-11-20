@@ -1,59 +1,47 @@
-# Noor Portfolio - Supabase + EmailJS
+# Noor Farra Portfolio
 
-## 1) Supabase
+Personal portfolio for Noor Farra, Software Developer. The public interface follows the supplied minimalist portfolio reference, with real project screenshots, current education and training, and the approved one-page CV.
 
-1. Create a Supabase project.
-2. Open SQL Editor.
-3. Run `supabase-setup.sql`.
-4. Run `supabase-seed.sql` if you want sample projects.
-5. Create an auth user from Authentication > Users.
-6. Add your keys in `js/config.js`:
+## Build and preview
 
-```js
-export const SUPABASE_URL = "https://YOUR-PROJECT.supabase.co";
-export const SUPABASE_ANON_KEY = "YOUR_ANON_KEY";
-export const STORAGE_BUCKET = "project-images";
+```sh
+pnpm install --frozen-lockfile
+pnpm run build
+python -m http.server 5500 --directory dist
 ```
 
-## 2) EmailJS contact form
+Open `http://localhost:5500`. Vercel uses the same build and publishes `dist/`.
+Tailwind CSS 3.4.17 is compiled at build time; the public site does not use the Tailwind runtime CDN. Login and dashboard retain their existing stylesheet.
 
-1. Create an EmailJS account.
-2. Add an Email Service.
-3. Create an Email Template.
-4. In the template, use these variables:
+## Content and CV
 
-```txt
-{{from_name}}
-{{from_email}}
-{{message}}
-{{to_name}}
-```
+- `index.html`: accessible public content, matching the approved CV.
+- `js/project-data.js`: metadata for S2 TURBO, Bikhtisar, and Wajehti.
+- `assets/Noor_Farra_CV.pdf`: approved downloadable CV, available from the hero and resume card.
+- `assets/projects/`: screenshots of the actual projects.
+- `src/portfolio.css` and `tailwind.config.cjs`: reference design tokens and responsive styling.
+- `js/portfolio.js`: navigation, persistent color mode, email copy, and published Supabase projects.
 
-5. Add your EmailJS keys in `js/config.js`:
+The three current projects are rendered in the initial HTML. If Supabase is unavailable, visitors can still browse them and download the CV. Once connected, published project records are loaded from Supabase. Project image and link URLs are restricted to HTTP(S), and database text is assigned as text rather than executable markup.
 
-```js
-export const EMAILJS_PUBLIC_KEY = "YOUR_PUBLIC_KEY";
-export const EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID";
-export const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";
-```
+## Dedicated Supabase project
 
-## 3) Run locally
+Use a new dedicated project. Do not run the initial schema on the paused legacy project or on the automotive or news projects.
 
-Do not open the HTML file directly. Use Live Server or:
+1. Apply `supabase/migrations/20261120144311_portfolio_schema.sql` to the new project. `supabase-setup.sql` contains the same initial schema for the SQL Editor; use either method, once.
+2. Apply `supabase-seed.sql` to add the three CV projects. It is safe to rerun.
+3. Set the new public project URL and publishable key in `js/config.js`. Never put secret or service-role keys in browser code.
+4. Create the owner's application login through Supabase Authentication, using credentials chosen by the owner. Account credentials are not copied from the old paused project.
+5. Through the trusted SQL Editor, add that user's UUID to `public.portfolio_admins`:
 
-```bash
-python -m http.server 5500
-```
+   ```sql
+   insert into public.portfolio_admins (user_id)
+   values ('OWNER_AUTH_USER_UUID')
+   on conflict (user_id) do nothing;
+   ```
 
-Then open:
+6. Verify anonymous project reads and administrator login, upload, and edit access.
 
-```txt
-http://localhost:5500
-```
+RLS allows visitors to read published projects and public project images. Only the administrator allowlist can write project records or images. The allowlist itself cannot be edited by public or authenticated API clients. The image bucket accepts JPEG, PNG, WebP, and AVIF up to 5 MB.
 
-## Important
-
-- `index.html` is static except the projects container and the contact form logic.
-- Projects come from Supabase.
-- Dashboard is protected by Supabase Auth.
-- Contact form sends via EmailJS.
+The contact section uses the real public email address and phone number. It does not submit email automatically. Existing EmailJS configuration is retained for compatibility with the previous source.

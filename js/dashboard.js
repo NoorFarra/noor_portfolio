@@ -79,13 +79,24 @@ async function removeStoredImage(publicUrl) {
 
 async function requireAuth() {
   ensureSupabase();
-  const { data, error } = await supabase.auth.getSession();
+  const { data, error } = await supabase.auth.getUser();
+  if (error?.name === 'AuthSessionMissingError') {
+    window.location.href = 'login.html';
+    return false;
+  }
   if (error) throw error;
-  if (!data.session?.user) {
+  if (!data.user) {
     window.location.href = "login.html";
     return false;
   }
-  currentUser = data.session.user;
+  const { data: admin, error: adminError } = await supabase.from('portfolio_admins')
+    .select('user_id').eq('user_id', data.user.id).maybeSingle();
+  if (adminError) throw adminError;
+  if (!admin) {
+    window.location.href = 'login.html?access=denied';
+    return false;
+  }
+  currentUser = data.user;
   if (els.dashboardUser) els.dashboardUser.textContent = currentUser.email;
   return true;
 }

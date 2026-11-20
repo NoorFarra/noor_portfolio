@@ -1,37 +1,9 @@
-insert into public.projects (
-  title,
-  description,
-  image_url,
-  live_url,
-  is_featured,
-  is_published,
-  display_order
-)
-values
-(
-  'Obsidian Ledger',
-  'A modern dashboard concept with a moody premium feel, focused on clarity, speed, and storytelling.',
-  'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80',
-  'https://example.com/obsidian-ledger',
-  true,
-  true,
-  1
-),
-(
-  'CyberPeak Security',
-  'A security-focused product experience that combines strong UI hierarchy with crisp interaction patterns.',
-  'https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&w=1200&q=80',
-  'https://example.com/cyberpeak-security',
-  false,
-  true,
-  2
-),
-(
-  'Aether Network',
-  'A clean product presentation crafted for speed, atmosphere, and modern brand storytelling.',
-  'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80',
-  'https://example.com/aether-network',
-  false,
-  true,
-  3
-);
+-- CV-matching published projects. Apply after portfolio_schema.
+begin;
+update public.projects set title='S2 TURBO', description='An automotive customization platform with a parts catalog and interactive 3D garage. Includes compatible-part previews, before-and-after comparisons, saved configurations, and performance estimates.', image_url='/assets/projects/s2-turbo.jpg', live_url='https://s2-turbo-performance.nooringyby.chatgpt.site/', is_published=true, is_featured=true, display_order=0 where live_url='https://s2-turbo-performance.nooringyby.chatgpt.site/';
+insert into public.projects (title, description, image_url, live_url,is_published,is_featured,display_order) select 'S2 TURBO', 'An automotive customization platform with a parts catalog and interactive 3D garage. Includes compatible-part previews, before-and-after comparisons, saved configurations, and performance estimates.', '/assets/projects/s2-turbo.jpg', 'https://s2-turbo-performance.nooringyby.chatgpt.site/',true,true,0 where not exists(select 1 from public.projects where live_url='https://s2-turbo-performance.nooringyby.chatgpt.site/');
+update public.projects set title='Bikhtisar', description='An Arabic news website with editorial roles, content review, approval, and scheduled publishing. Its Android/iOS app connects to the same backend for news, stories, reports, and search.', image_url='/assets/projects/bikhtisar.jpg', live_url='https://www.bikhtisar.site/', is_published=true, is_featured=false, display_order=1 where live_url='https://www.bikhtisar.site/';
+insert into public.projects (title, description, image_url, live_url,is_published,is_featured,display_order) select 'Bikhtisar', 'An Arabic news website with editorial roles, content review, approval, and scheduled publishing. Its Android/iOS app connects to the same backend for news, stories, reports, and search.', '/assets/projects/bikhtisar.jpg', 'https://www.bikhtisar.site/',true,false,1 where not exists(select 1 from public.projects where live_url='https://www.bikhtisar.site/');
+update public.projects set title='Wajehti Platform', description='An Arabic dashboard combining website shortcuts and search with currency exchange rates, Ramallah weather, and daily prayer times.', image_url='/assets/projects/wajehti.jpg', live_url='https://wajehtii.vercel.app/', is_published=true, is_featured=false, display_order=2 where live_url='https://wajehtii.vercel.app/';
+insert into public.projects (title, description, image_url, live_url,is_published,is_featured,display_order) select 'Wajehti Platform', 'An Arabic dashboard combining website shortcuts and search with currency exchange rates, Ramallah weather, and daily prayer times.', '/assets/projects/wajehti.jpg', 'https://wajehtii.vercel.app/',true,false,2 where not exists(select 1 from public.projects where live_url='https://wajehtii.vercel.app/');
+commit;

@@ -1,4 +1,4 @@
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/+esm";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./config.js";
 
 const invalidUrl =
@@ -10,7 +10,7 @@ const invalidUrl =
 const invalidKey =
   !SUPABASE_ANON_KEY ||
   SUPABASE_ANON_KEY.includes("PASTE_YOUR") ||
-  SUPABASE_ANON_KEY.length < 50;
+  (!SUPABASE_ANON_KEY.startsWith("sb_publishable_") && SUPABASE_ANON_KEY.length < 50);
 
 const hasMissingConfig = invalidUrl || invalidKey;
 
