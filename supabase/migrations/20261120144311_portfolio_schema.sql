@@ -24,6 +24,7 @@ create table public.projects (
   updated_at timestamptz not null default now()
 );
 alter table public.projects enable row level security;
+revoke all on public.projects from anon, authenticated;
 grant select on public.projects to anon, authenticated;
 grant insert, update, delete on public.projects to authenticated;
 create index projects_created_by_idx on public.projects(created_by);

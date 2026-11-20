@@ -1,13 +1,23 @@
 import { PROJECTS } from './project-data.js';
 
 const root = document.documentElement;
+const revealObserver = 'IntersectionObserver' in window ? new IntersectionObserver(entries => {
+  for (const entry of entries) {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('in-view');
+      revealObserver.unobserve(entry.target);
+    }
+  }
+}, { threshold: 0.08 }) : null;
+if (revealObserver) {
+  root.classList.add('js-ready');
+  document.querySelectorAll('.reveal').forEach(element => revealObserver.observe(element));
+}
 const themeButton = document.querySelector('[aria-label="Toggle color mode"]');
-const themeIcon = themeButton?.querySelector('.material-symbols-outlined');
 
 function syncThemeButton() {
   const isLight = root.dataset.theme === 'light';
   themeButton?.setAttribute('aria-pressed', String(isLight));
-  if (themeIcon) themeIcon.textContent = isLight ? 'light_mode' : 'dark_mode';
 }
 syncThemeButton();
 themeButton?.addEventListener('click', () => {
@@ -51,9 +61,7 @@ function updateActiveNavigation() {
   for (const link of navLinks) {
     if (link.dataset.path === current) link.setAttribute('aria-current', 'page');
     else link.removeAttribute('aria-current');
-    link.classList.toggle('text-on-surface', link.dataset.path === current);
-    link.classList.toggle('text-on-surface-variant', link.dataset.path !== current);
-    link.classList.toggle('font-medium', link.dataset.path === current);
+    link.classList.toggle('is-active', link.dataset.path === current);
   }
 }
 let scrollFrame = 0;
@@ -74,19 +82,20 @@ copyButton?.addEventListener('click', async () => {
   try {
     await navigator.clipboard.writeText(email);
     copyText.textContent = 'Email copied';
-    copyIcon.textContent = 'check';
+    copyIcon.textContent = '\u2713';
     copyStatus.textContent = 'Email address copied to clipboard.';
   } catch {
-    copyText.textContent = email;
+    copyText.textContent = 'Copy email';
     copyStatus.textContent = `You can email me at ${email}.`;
   }
   copyTimer = setTimeout(() => {
-    copyText.textContent = email;
-    copyIcon.textContent = 'content_copy';
+    copyText.textContent = 'Copy email';
+    copyIcon.textContent = '\u29c9';
   }, 2500);
 });
 
 function safeUrl(value) {
+  if (typeof value !== 'string' || !value.trim()) return null;
   try {
     const url = new URL(value, location.origin);
     return ['https:', 'http:'].includes(url.protocol) ? url.href : null;
@@ -99,19 +108,22 @@ function renderPublishedProjects(rows) {
   if (!grid || !template) return;
   const fragment = document.createDocumentFragment();
   const normalize = value => safeUrl(value)?.replace(/\/$/, '');
-  for (const row of rows) {
+  for (const [index, row] of rows.entries()) {
     const known = PROJECTS.find(project => normalize(project.live_url) === normalize(row.live_url));
     const card = template.cloneNode(true);
+    card.classList.toggle('featured', index === 0);
+    card.classList.add('in-view');
     card.dataset.project = known?.id || row.id;
     card.querySelector('h3').textContent = row.title;
-    card.querySelector('p').textContent = row.description;
-    card.querySelector('.absolute').textContent = known?.category || 'Project';
+    card.querySelector('.project-description').textContent = row.description;
+    card.querySelector('.project-category').textContent = known?.category || 'Project';
+    card.querySelector('.project-overline').textContent = known?.id === 's2-turbo' ? 'Interactive web experience' : known?.id === 'bikhtisar' ? 'Web & mobile' : known?.id === 'wajehti' ? 'Everyday utility' : 'Selected project';
     const image = card.querySelector('img');
     const fallback = known?.image_url || 'assets/project-placeholder.svg';
     image.src = safeUrl(row.image_url) || fallback;
     image.alt = `${row.title} project screenshot`;
     image.addEventListener('error', () => { image.src = fallback; }, { once: true });
-    const technologies = card.querySelector('.flex.flex-wrap');
+    const technologies = card.querySelector('.project-tech');
     const chip = technologies.firstElementChild?.cloneNode();
     technologies.replaceChildren();
     for (const technology of known?.technologies || []) {
@@ -119,7 +131,7 @@ function renderPublishedProjects(rows) {
       element.textContent = technology;
       technologies.append(element);
     }
-    const links = card.querySelector('.border-t');
+    const links = card.querySelector('.project-links');
     const viewLink = links.querySelector('a').cloneNode(true);
     links.replaceChildren();
     const liveUrl = safeUrl(row.live_url);
@@ -128,15 +140,19 @@ function renderPublishedProjects(rows) {
       const github = viewLink.cloneNode();
       github.textContent = 'GitHub';
       github.href = known.github_url;
+      github.className = 'project-github';
       links.append(github);
     }
     fragment.append(card);
   }
-  for (const oldCard of grid.querySelectorAll('article,[data-projects-empty]')) oldCard.remove();
+  for (const oldCard of grid.querySelectorAll('article,[data-projects-empty]')) {
+    revealObserver?.unobserve(oldCard);
+    oldCard.remove();
+  }
   if (!rows.length) {
     const empty = document.createElement('p');
     empty.dataset.projectsEmpty = '';
-    empty.className = 'text-on-surface-variant text-body-lg';
+    empty.className = 'projects-empty';
     empty.textContent = 'New work is on the way.';
     fragment.append(empty);
   }

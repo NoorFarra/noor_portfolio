@@ -1,6 +1,6 @@
 # Noor Farra Portfolio
 
-Personal portfolio for Noor Farra, Software Developer. The public interface follows the supplied minimalist portfolio reference, with real project screenshots, current education and training, and the approved one-page CV.
+Personal portfolio for Noor Farra, Software Developer. The public interface uses a custom editorial design with Manrope and Instrument Serif, a dark green palette, real project screenshots, current education and training, and the approved one-page CV.
 
 ## Build and preview
 
@@ -28,7 +28,7 @@ The three current projects are rendered in the initial HTML. If Supabase is unav
 
 Use a new dedicated project. Do not run the initial schema on the paused legacy project or on the automotive or news projects.
 
-1. Apply `supabase/migrations/20261120144311_portfolio_schema.sql` to the new project. `supabase-setup.sql` contains the same initial schema for the SQL Editor; use either method, once.
+1. Apply the files in `supabase/migrations/` in chronological order to a new project. `supabase-setup.sql` contains the initial schema for the SQL Editor; use it instead of the initial migration, once.
 2. Apply `supabase-seed.sql` to add the three CV projects. It is safe to rerun.
 3. Set the new public project URL and publishable key in `js/config.js`. Never put secret or service-role keys in browser code.
 4. Create the owner's application login through Supabase Authentication, using credentials chosen by the owner. Account credentials are not copied from the old paused project.
@@ -45,3 +45,5 @@ Use a new dedicated project. Do not run the initial schema on the paused legacy 
 RLS allows visitors to read published projects and public project images. Only the administrator allowlist can write project records or images. The allowlist itself cannot be edited by public or authenticated API clients. The image bucket accepts JPEG, PNG, WebP, and AVIF up to 5 MB.
 
 The contact section uses the real public email address and phone number. It does not submit email automatically. Existing EmailJS configuration is retained for compatibility with the previous source.
+
+The dedicated project currently configured is `hzrsneyogjpobnqjaeim`. Browser code uses its publishable key; privileged keys are not included.
